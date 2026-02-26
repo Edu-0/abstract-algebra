@@ -25,7 +25,7 @@ Small, educational scripts exploring arithmetic over **GF(2)** and **GF(2^8)** (
   - Prints checks showing that `b * b^-1 = 1 (mod a)` in GF(2^8) arithmetic
 
 - `euclid.py`  
-  Appears to contain supporting explanations / earlier Euclid work referenced by the other scripts.
+  Contain supporting explanations of Euclidean Algorithm referenced by the other scripts.
 
 ## Brief Explanation
 
