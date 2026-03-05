@@ -9,6 +9,8 @@ Small, educational scripts exploring arithmetic over **GF(2)** and **GF(2^8)** (
 
 > This repo is primarily for learning/training and includes print-based demonstrations.
 
+AES cryptography will be developed here, part by part, and in the end will be moved to a separate repo.
+
 ## Files
 
 - `gf_operations.py`  
