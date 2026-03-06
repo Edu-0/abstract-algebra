@@ -1,6 +1,6 @@
 import numpy as np
 import s_box as sb
-import mix_columns as mc
+import shift_rows as sr
 
 def print_hex(bb):
     for i in range(bb.shape[0]):
@@ -17,8 +17,8 @@ def s_box_block(bb):
 
     return res_array
 
-def mix_columns(bb):
-    return mc.shift_rows(s_box_block(bb))
+def shift_rows(bb):
+    return sr.shift_rows(s_box_block(bb))
 def get_test_block():
     return state
 
@@ -30,5 +30,5 @@ byte_block = [
     [0xF0, 0x2D, 0xAD, 0xC5]]
 
 byte_block = np.array(byte_block)
-state = mix_columns(byte_block)
+state = shift_rows(byte_block)
 print_hex(state)
