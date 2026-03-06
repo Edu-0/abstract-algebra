@@ -1,3 +1,5 @@
+import numpy as np
+
 def gf_mul(f, g):
     result = 0
     for i in range(g.bit_length()):
@@ -58,3 +60,35 @@ def gf_egcd(a, b):
 
 def multiplicative_inverse(a, b):
     return gf_egcd(a, b)[2]
+
+
+# Working with matrices in GF(2)
+def byte_to_array(byte):
+    return np.array(list(byte), dtype=int)
+
+
+def vet_sum(vet_a, c):
+    byte_res = np.zeros(vet_a.shape[0], dtype=int)
+    for i in range(vet_a.shape[0]):
+        byte_res[i] = vet_a[i] ^ c[i]
+    return byte_res
+
+
+def mat_mul(matA, vet_b):
+    vet_res = np.zeros(matA.shape[0], dtype=int)
+    for i in range(matA.shape[0]):
+        for j in range(vet_b.shape[0]):
+            vet_res[i] ^= matA[i][j] & vet_b[j]
+    return vet_res
+
+
+# Affine Transform is the main operation on S-Box, which finds the values equals to the ones on the table
+def affine_transform(matA, vet_b, c):
+    return vet_sum(mat_mul(matA, vet_b), c)
+
+
+def arr_to_byte(arr):
+    sub_byte = 0
+    for i in range(arr.shape[0]):
+        sub_byte |= arr[i] << i
+    return sub_byte
