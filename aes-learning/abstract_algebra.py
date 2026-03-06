@@ -67,24 +67,24 @@ def byte_to_array(byte):
     return np.array(list(byte), dtype=int)
 
 
-def vet_sum(vet_a, c):
-    byte_res = np.zeros(vet_a.shape[0], dtype=int)
-    for i in range(vet_a.shape[0]):
-        byte_res[i] = vet_a[i] ^ c[i]
+def vet_sum(mat_a, c):
+    byte_res = np.zeros(mat_a.shape[0], dtype=int)
+    for i in range(mat_a.shape[0]):
+        byte_res[i] = mat_a[i] ^ c[i]
     return byte_res
 
 
-def mat_mul(matA, vet_b):
-    vet_res = np.zeros(matA.shape[0], dtype=int)
-    for i in range(matA.shape[0]):
-        for j in range(vet_b.shape[0]):
-            vet_res[i] ^= matA[i][j] & vet_b[j]
+def mat_mul(mat_a, mat_b):
+    vet_res = np.zeros(mat_a.shape[0], dtype=int)
+    for i in range(mat_a.shape[0]):
+        for j in range(mat_b.shape[0]):
+            vet_res[i] ^= mat_a[i][j] & mat_b[j]
     return vet_res
 
 
 # Affine Transform is the main operation on S-Box, which finds the values equals to the ones on the table
-def affine_transform(matA, vet_b, c):
-    return vet_sum(mat_mul(matA, vet_b), c)
+def affine_transform(mat_a, mat_b, c):
+    return vet_sum(mat_mul(mat_a, mat_b), c)
 
 
 def arr_to_byte(arr):
