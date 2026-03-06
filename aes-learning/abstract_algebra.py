@@ -103,3 +103,11 @@ def arr_to_byte(arr):
     for i in range(arr.shape[0]):
         sub_byte |= arr[i] << i
     return sub_byte
+
+
+def xor_matrix(mat_a, mat_b):
+    vet_res = np.zeros((mat_a.shape[0], mat_b.shape[1]), dtype=int)
+    for i in range(mat_a.shape[0]):
+        for j in range(mat_b.shape[1]):
+            vet_res[i][j] = mat_a[i][j] ^ mat_b[i][j]
+    return vet_res
