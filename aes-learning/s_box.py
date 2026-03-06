@@ -1,63 +1,5 @@
 import numpy as np
-
-
-def gf_mul(f, g):
-    result = 0
-    for i in range(g.bit_length()):
-        if (g >> i) & 1:
-            temp = f
-            for _ in range(i):
-                of = bin((temp & 0x80) >> 7)[2:]
-                temp = (temp << 1) & 0xFF
-                if of == "1":
-                    temp ^= 0b11011
-
-            result ^= temp
-    return result
-
-
-def gf2_mul(f, g):
-    result = 0
-    for i in range(g.bit_length()):
-        if (g >> i) & 1:
-            temp = f
-            for _ in range(i):
-                temp = temp << 1
-            result ^= temp
-    return result
-
-
-def deg(b):
-    for i in range(len(bin(b)[2:]) - 1, -1, -1):
-        if (b >> i) & 1:
-            return i
-    return 0
-
-
-def gf2_div(a, b):
-    q = 0
-    r = a
-
-    while deg(r) >= deg(b):
-        shift = deg(r) - deg(b)
-        q |= (1 << shift)
-        r ^= (b << shift)
-        if r == 0:
-            break
-    return q, r
-
-
-def gf_egcd(a, b):
-    if b == 0:
-        return a, 1, 0
-
-    q, r = gf2_div(a, b)
-    g, x1, y1 = gf_egcd(b, r)
-
-    x = y1
-    y = x1 ^ gf_mul(q, y1)
-
-    return g, x, y
+import abstract_algebra as aa
 
 
 # Working with matrices in GF(2)
@@ -92,47 +34,46 @@ def arr_to_byte(arr):
     return sub_byte
 
 
-irr = 0b100011011
-a = 0b00100010
-g, xf, yf = gf_egcd(irr, a)
+def table_positions(b):
+    # It's relevant to see those 4 bits to locate on the default table given by AES to verify answers
+    left_4_bits = (b >> 4) & 0b1111
+    right_4_bits = b & 0b1111
+    print(f"Left 4 bits: {bin(left_4_bits)} or {hex(left_4_bits)}")
+    print(f"Right 4 bits: {bin(right_4_bits)} or {hex(right_4_bits)}")
+    print("")
 
-g_bin, xf_bin, yf_bin = bin(g), bin(xf), bin(yf)
-print(f"ax + by = gcd(a, b) -> {bin(irr)}*{xf_bin} + {bin(a)}*{yf_bin} = {g_bin}")
 
-multiplicative_inverse = yf
+def aes_sbox(b):
+    irr = 0b100011011
+    yf = aa.multiplicative_inverse(irr, b)
 
-print("The multiplicative inverse of the given polynom is: ")
-print(f"Full value: {bin(yf)} or {hex(yf)}\n")
+    # Beginning the S-box programming
 
-# Beginning the S-box programming
+    mat_a = np.array([
+        [1, 0, 0, 0, 1, 1, 1, 1],
+        [1, 1, 0, 0, 0, 1, 1, 1],
+        [1, 1, 1, 0, 0, 0, 1, 1],
+        [1, 1, 1, 1, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 0, 0, 0],
+        [0, 1, 1, 1, 1, 1, 0, 0],
+        [0, 0, 1, 1, 1, 1, 1, 0],
+        [0, 0, 0, 1, 1, 1, 1, 1]
+    ], dtype=int)
 
-# It's relevant to see those 4 bits to locate on the default table given by AES to verify answers
-left_4_bits = (a >> 4) & 0b1111
-right_4_bits = a & 0b1111
-print(f"Left 4 bits: {bin(left_4_bits)} or {hex(left_4_bits)}")
-print(f"Right 4 bits: {bin(right_4_bits)} or {hex(right_4_bits)}")
-print("")
+    c = np.array([1, 1, 0, 0, 0, 1, 1, 0], dtype=int)
 
-# 0b00100010: 2x2 in S-Box = 93
+    vet_b = byte_to_array(bin(yf)[2::].zfill(8)[::-1])
 
-matA = np.array([
-    [1, 0, 0, 0, 1, 1, 1, 1],
-    [1, 1, 0, 0, 0, 1, 1, 1],
-    [1, 1, 1, 0, 0, 0, 1, 1],
-    [1, 1, 1, 1, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 0, 0, 0],
-    [0, 1, 1, 1, 1, 1, 0, 0],
-    [0, 0, 1, 1, 1, 1, 1, 0],
-    [0, 0, 0, 1, 1, 1, 1, 1]
-], dtype=int)
+    byte_res = affine_transform(mat_a, vet_b, c)
 
-c = np.array([1, 1, 0, 0, 0, 1, 1, 0], dtype=int)
+    sub_byte = arr_to_byte(byte_res)
 
-vet_b = byte_to_array(bin(yf)[2::].zfill(8)[::-1])
+    return sub_byte
 
-byte_res = affine_transform(matA, vet_b, c)
+byte = 0b00100010  # 0b00100010: 2x2 in S-Box = 93
 
-sub_byte = arr_to_byte(byte_res)
+# table_positions(byte)
 
-print(byte_res)
-print(hex(sub_byte))
+final_sub_byte = aes_sbox(byte)
+
+print(hex(final_sub_byte))
