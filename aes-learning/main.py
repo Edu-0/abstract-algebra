@@ -3,7 +3,6 @@ import s_box as sb
 import shift_rows as sr
 import mix_columns as mc
 import add_round_key as ark
-import abstract_algebra as aa
 
 
 def print_hex(bb):
@@ -33,15 +32,9 @@ def mix_columns(bb):
 def add_round_key(bb, round_key):
     return ark.add_round_key(mc.mix_columns(sr.shift_rows(s_box_block(bb))), round_key)
 
+
 def cryptograph_block(bb, round_key):
     return add_round_key(bb, round_key)
-
-def get_test_block():
-    return ciphered_byte
-
-
-def get_test_key():
-    return test_key
 
 
 byte_block = np.array(
