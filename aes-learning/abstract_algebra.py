@@ -1,8 +1,9 @@
 import numpy as np
 
+
 def gf_mul(f, g):
     result = 0
-    for i in range(g.bit_length()):
+    for i in range(len(bin(g)[2:])):
         if (g >> i) & 1:
             temp = f
             for _ in range(i):
@@ -17,7 +18,7 @@ def gf_mul(f, g):
 
 def gf2_mul(f, g):
     result = 0
-    for i in range(g.bit_length()):
+    for i in range(len(bin(g)[2:])):
         if (g >> i) & 1:
             temp = f
             for _ in range(i):
@@ -58,6 +59,7 @@ def gf_egcd(a, b):
 
     return g, x, y
 
+
 def multiplicative_inverse(a, b):
     return gf_egcd(a, b)[2]
 
@@ -74,17 +76,26 @@ def vet_sum(mat_a, c):
     return byte_res
 
 
-def mat_mul(mat_a, mat_b):
+def mat_vet_mul(mat_a, vet_b):
     vet_res = np.zeros(mat_a.shape[0], dtype=int)
     for i in range(mat_a.shape[0]):
-        for j in range(mat_b.shape[0]):
-            vet_res[i] ^= mat_a[i][j] & mat_b[j]
+        for j in range(vet_b.shape[0]):
+            vet_res[i] ^= mat_a[i][j] & vet_b[j]
+    return vet_res
+
+
+def mat_mul(mat_a, mat_b):
+    vet_res = np.zeros((mat_a.shape[0], mat_b.shape[1]), dtype=int)
+    for i in range(mat_a.shape[0]):
+        for j in range(mat_b.shape[1]):
+            for k in range(mat_a.shape[1]):
+                vet_res[i][j] ^= gf_mul(mat_a[i][k], mat_b[k][j])
     return vet_res
 
 
 # Affine Transform is the main operation on S-Box, which finds the values equals to the ones on the table
-def affine_transform(mat_a, mat_b, c):
-    return vet_sum(mat_mul(mat_a, mat_b), c)
+def affine_transform(mat_a, vet_b, c):
+    return vet_sum(mat_vet_mul(mat_a, vet_b), c)
 
 
 def arr_to_byte(arr):
