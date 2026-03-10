@@ -4,6 +4,7 @@ from sympy import ceiling
 text1 = "João comeu feijão e não fez bem! ≤, ∞, ±, √"
 text2 = "An even longer test text with more than 16 bits, 51"
 text = "Olá Mundo"
+text3 = "aaaaaaaaaaaaaaaa"
 
 
 # Simple conversion to binary
@@ -22,4 +23,12 @@ def normalize_list(bin_list):
     return bin_list
 
 
-bin_list = normalize_list(string_to_bin(text))
+def array_creator(bin_list):
+    array_list = []
+    for i in range(0, len(bin_list), 16):
+        array_list.append(np.array(np.reshape(bin_list[i:i+16], (4,4)), dtype=int))
+    return array_list
+
+
+bin_list = normalize_list(string_to_bin(text2))
+print(array_creator(bin_list))
