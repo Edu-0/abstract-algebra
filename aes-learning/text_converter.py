@@ -1,10 +1,4 @@
 import numpy as np
-from sympy import ceiling
-
-text1 = "João comeu feijão e não fez bem! ≤, ∞, ±, √"
-text2 = "An even longer test text with more than 16 bits, 51"
-text = "Olá Mundo"
-text3 = "aaaaaaaaaaaaaaaa"
 
 
 # Simple conversion to binary
@@ -30,5 +24,5 @@ def array_creator(bin_list):
     return array_list
 
 
-bin_list = normalize_list(string_to_bin(text2))
-print(array_creator(bin_list))
+def start_conversion(text):
+    return array_creator(normalize_list(string_to_bin(text)))
