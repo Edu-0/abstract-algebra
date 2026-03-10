@@ -3,12 +3,16 @@ import s_box as sb
 import shift_rows as sr
 import mix_columns as mc
 import add_round_key as ark
+import text_converter as tc
 
 
-def print_hex(bb):
-    for i in range(bb.shape[0]):
-        for j in range(bb.shape[1]):
-            print(f"{bb[i, j]:02X}", end=" ")
+def print_hex(blocks):
+    for k, bb in enumerate(blocks):
+        print(f"Block {k}")
+        for i in range(bb.shape[0]):
+            for j in range(bb.shape[1]):
+                print(f"{bb[i, j]:02X}", end=" ")
+            print()
         print()
 
 
@@ -33,19 +37,16 @@ def add_round_key(bb, round_key):
     return ark.add_round_key(mc.mix_columns(sr.shift_rows(s_box_block(bb))), round_key)
 
 
-def cryptograph_block(bb, round_key):
-    return add_round_key(bb, round_key)
+def start_cryptography(bb, rk):
+    return add_round_key(bb, rk)
 
 
-byte_block = np.array(
-    [
-        [0xEA, 0x04, 0x65, 0x85],
-        [0x83, 0x45, 0x5D, 0x96],
-        [0x5C, 0x33, 0x98, 0xB0],
-        [0xF0, 0x2D, 0xAD, 0xC5]
-    ],
-    dtype=int
-)
+def cryptograph_blocks(bbs, rk):
+    converted_blocks = []
+    for i in range(len(bbs)):
+        converted_blocks.append(start_cryptography(bbs[i], rk))
+    return converted_blocks
+
 
 test_key = np.array(
     [
@@ -57,6 +58,8 @@ test_key = np.array(
     dtype=int
 )
 
-ciphered_byte = cryptograph_block(byte_block, test_key)
+text = "Super text for testings"
+byte_blocks = tc.start_conversion(text)
+encrypted_blocks = cryptograph_blocks(byte_blocks, test_key)
 
-print_hex(ciphered_byte)
+print_hex(encrypted_blocks)
