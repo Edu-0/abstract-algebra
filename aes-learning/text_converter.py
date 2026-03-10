@@ -2,8 +2,15 @@ import numpy as np
 
 
 # Simple conversion to binary
-def string_to_bin(text):
+def encode_text(text):
     return list(text.encode("UTF-8"))
+
+
+def decode_text(byte_text):
+    bits_fix = int(byte_text, 2).to_bytes(len(byte_text) // 8, "big")
+    padding = bits_fix[-1] # Gets the last bit as it will always have padding
+    bits_fix = bits_fix[:-padding] # Removing the padding as it can conflict with the UTF-8 reading to decode
+    return bits_fix.decode("UTF-8")
 
 
 # This function makes sure that the list has a size multiple of 16 for it to be able to divide into blocks of 4x4
@@ -24,5 +31,18 @@ def array_creator(bin_list):
     return array_list
 
 
-def start_conversion(text):
-    return array_creator(normalize_list(string_to_bin(text)))
+def byte_blocks_to_text(byte_blocks):
+    decoded_string = ""
+    for _, bb in enumerate(byte_blocks):
+        for i in range(bb.shape[0]):
+            for j in range(bb.shape[1]):
+                decoded_string += f"{bb[i][j]:08b}"
+    return decoded_string
+
+
+def start_encoding_conversion(text):
+    return array_creator(normalize_list(encode_text(text)))
+
+
+def start_decoding_conversion(byte_blocks):
+    return byte_blocks_to_text(byte_blocks)
